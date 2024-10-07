@@ -4,6 +4,7 @@
 // it will also allow to edit the page title and the page cover
 import { NodeData, NodeType, Page } from "../utils/types";
 import { useImmer } from "use-immer";
+import { arrayMove } from "@dnd-kit/sortable";
 
 // npm i --save use-immer - it is a state management library that allows you to work with complex state objects
 export const usePageState = (initialState: Page) => {
@@ -53,6 +54,14 @@ export const usePageState = (initialState: Page) => {
     });
   };
 
+  const reorderNodes = (id1: string, id2: string) => {
+    setPage((draft) => {
+      const node1Index = draft.nodes.findIndex((node) => node.id === id1);
+      const node2Index = draft.nodes.findIndex((node) => node.id === id2);
+      draft.nodes = arrayMove(draft.nodes, node1Index, node2Index);
+    });
+  };
+
   return {
     nodes: page.nodes,
     title: page.title,
@@ -64,6 +73,7 @@ export const usePageState = (initialState: Page) => {
     setNodes,
     setTitle,
     setCoverImage,
+    reorderNodes,
   };
 };
 
