@@ -1,4 +1,4 @@
-import { NodeData } from "../utils/types";
+import { NodeData, NodeType } from "../utils/types";
 import styles from "./Node.module.css";
 import {
   useRef,
@@ -8,6 +8,8 @@ import {
 } from "react";
 import { nanoid } from "nanoid";
 import { useAppState } from "../state/AppStateContext"; //hook
+import { CommandPanel } from "./CommandPanel";
+import cx from "classnames";
 type BasicNodeProps = {
   node: NodeData;
   // function to update the focusedNode index
@@ -32,7 +34,10 @@ export const BasicNode = ({
 BasicNodeProps) => {
   const nodeRef = useRef<HTMLDivElement>(null);
 
-  const { changeNodeValue, addNode, removeNodeByIndex } = useAppState();
+  const showCommandPanel = isFocused && node?.value?.match(/^\//); // in the begining of a line we have a slash
+
+  const { changeNodeValue, addNode, removeNodeByIndex, changeNodeType } =
+    useAppState();
   useEffect(() => {
     if (isFocused) {
       nodeRef.current?.focus();
@@ -47,6 +52,13 @@ BasicNodeProps) => {
       nodeRef.current.textContent = node.value;
     }
   }, [node]);
+
+  const parseCommand = (nodeType: NodeType) => {
+    if (nodeRef.current) {
+      changeNodeType(index, nodeType);
+      nodeRef.current.textContent = "";
+    }
+  };
 
   const handleInput: FormEventHandler<HTMLDivElement> = ({ currentTarget }) => {
     const { textContent } = currentTarget;
@@ -81,14 +93,19 @@ BasicNodeProps) => {
   };
 
   return (
-    <div
-      onInput={handleInput}
-      onClick={handleClick}
-      onKeyDown={onKeyDown}
-      ref={nodeRef}
-      contentEditable
-      suppressContentEditableWarning
-      className={styles.node}
-    />
+    <>
+      {showCommandPanel && (
+        <CommandPanel selectItem={parseCommand} nodeText={node.value} />
+      )}
+      <div
+        onInput={handleInput}
+        onClick={handleClick}
+        onKeyDown={onKeyDown}
+        ref={nodeRef}
+        contentEditable
+        suppressContentEditableWarning
+        className={cx(styles.node, styles[node.type])}
+      />
+    </>
   );
 };
