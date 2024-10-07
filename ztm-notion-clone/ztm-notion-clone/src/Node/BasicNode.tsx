@@ -7,16 +7,18 @@ import {
   KeyboardEventHandler,
 } from "react";
 import { nanoid } from "nanoid";
+import { useAppState } from "../state/AppStateContext"; //hook
 type BasicNodeProps = {
   node: NodeData;
   // function to update the focusedNode index
   updateFocusedIndex(index: number): void;
   isFocused: boolean;
   index: number;
-  // new node from current node
-  addNode(node: NodeData, index: number): void;
-  removeNodeByIndex(index: number): void;
-  changeNodeValue(index: number, value: string): void;
+  // // new node from current node
+  // addNode(node: NodeData, index: number): void;
+  // removeNodeByIndex(index: number): void;
+  // changeNodeValue(index: number, value: string): void;
+  // removing above methods as we get them directly from AppStateCOntext
 };
 
 export const BasicNode = ({
@@ -24,11 +26,13 @@ export const BasicNode = ({
   updateFocusedIndex,
   isFocused,
   index,
-  addNode,
-  removeNodeByIndex,
-  changeNodeValue,
-}: BasicNodeProps) => {
+}: // addNode,
+// removeNodeByIndex,
+// changeNodeValue,
+BasicNodeProps) => {
   const nodeRef = useRef<HTMLDivElement>(null);
+
+  const { changeNodeValue, addNode, removeNodeByIndex } = useAppState();
   useEffect(() => {
     if (isFocused) {
       nodeRef.current?.focus();

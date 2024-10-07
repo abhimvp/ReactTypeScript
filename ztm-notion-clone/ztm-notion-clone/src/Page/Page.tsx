@@ -1,36 +1,38 @@
-import { useState } from "react";
-import { NodeData } from "../utils/types";
+// import { useState } from "react";
+// import { NodeData } from "../utils/types";
 import { useFocusedNodeIndex } from "./useFocusedNodeIndex";
 import { Cover } from "./Cover";
 import { Spacer } from "./Spacer";
 import { BasicNode } from "../Node/BasicNode";
 import { Title } from "./Title";
 import { nanoid } from "nanoid";
+import { useAppState } from "../state/AppStateContext";
 
 export const Page = () => {
-  const [nodes, setNodes] = useState<NodeData[]>([]);
-  const [title, setTitle] = useState("Default Title");
+  //   const [nodes, setNodes] = useState<NodeData[]>([]);
+  //   const [title, setTitle] = useState("Default Title");
+  const { nodes, title, addNode, setTitle } = useAppState();
   const [focusedNodeIndex, setFocusedNodeIndex] = useFocusedNodeIndex({
     nodes,
   });
 
-  const addNode = (node: NodeData, index: number) => {
-    const newNodes = [...nodes]; // create a new array from nodes state , so that we can mutate it
-    newNodes.splice(index, 0, node); // splice calls modify the original array , we don't want this when working with state
-    setNodes(newNodes);
-  };
+  //   const addNode = (node: NodeData, index: number) => {
+  //     const newNodes = [...nodes]; // create a new array from nodes state , so that we can mutate it
+  //     newNodes.splice(index, 0, node); // splice calls modify the original array , we don't want this when working with state
+  //     setNodes(newNodes);
+  //   };
 
-  const removeNodeByIndex = (index: number) => {
-    const newNodes = [...nodes];
-    newNodes.splice(index, 1);
-    setNodes(newNodes);
-  };
+  //   const removeNodeByIndex = (index: number) => {
+  //     const newNodes = [...nodes];
+  //     newNodes.splice(index, 1);
+  //     setNodes(newNodes);
+  //   };
 
-  const changeNodeValue = (index: number, value: string) => {
-    const newNodes = [...nodes];
-    newNodes[index].value = value;
-    setNodes(newNodes);
-  };
+  //   const changeNodeValue = (index: number, value: string) => {
+  //     const newNodes = [...nodes];
+  //     newNodes[index].value = value;
+  //     setNodes(newNodes);
+  //   };
 
   return (
     <>
@@ -44,9 +46,9 @@ export const Page = () => {
             updateFocusedIndex={setFocusedNodeIndex}
             isFocused={focusedNodeIndex === index}
             index={index}
-            addNode={addNode}
-            removeNodeByIndex={removeNodeByIndex}
-            changeNodeValue={changeNodeValue}
+            // addNode={addNode}
+            // removeNodeByIndex={removeNodeByIndex}
+            // changeNodeValue={changeNodeValue} - we're getting these from APpStateCOntext
           />
         ))}
         <Spacer
