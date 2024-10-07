@@ -4,15 +4,20 @@ import { useFocusedNodeIndex } from "./useFocusedNodeIndex";
 import { Cover } from "./Cover";
 import { Spacer } from "./Spacer";
 // import { BasicNode } from "../Node/BasicNode";
-import { NodeTypeSwitcher } from "../Node/NodeTypeSwitcher";
+// import { NodeTypeSwitcher } from "../Node/NodeTypeSwitcher";
 import { Title } from "./Title";
 import { nanoid } from "nanoid";
 import { useAppState } from "../state/AppStateContext";
-
+import { DndContext, DragOverlay, DragEndEvent } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { NodeContainer } from "../Node/NodeContainer";
 export const Page = () => {
   //   const [nodes, setNodes] = useState<NodeData[]>([]);
   //   const [title, setTitle] = useState("Default Title");
-  const { nodes, title, addNode, setTitle } = useAppState();
+  const { nodes, title, addNode, setTitle, reorderNodes } = useAppState();
   const [focusedNodeIndex, setFocusedNodeIndex] = useFocusedNodeIndex({
     nodes,
   });
@@ -34,31 +39,43 @@ export const Page = () => {
   //     newNodes[index].value = value;
   //     setNodes(newNodes);
   //   };
+  const handleDragEvent = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over?.id !== over?.id && active?.id) {
+      reorderNodes(active.id as string, over.id as string);
+    }
+  };
 
   return (
     <>
       <Cover />
       <div>
         <Title addNode={addNode} title={title} changePageTitle={setTitle} />
-        {nodes.map((node, index) => (
-          <NodeTypeSwitcher
-            key={node.id}
-            node={node}
-            updateFocusedIndex={setFocusedNodeIndex}
-            isFocused={focusedNodeIndex === index}
-            index={index}
-          />
-          //   <BasicNode
-          //     key={node.id}
-          //     node={node}
-          //     updateFocusedIndex={setFocusedNodeIndex}
-          //     isFocused={focusedNodeIndex === index}
-          //     index={index}
-          //     // addNode={addNode}
-          //     // removeNodeByIndex={removeNodeByIndex}
-          //     // changeNodeValue={changeNodeValue} - we're getting these from APpStateCOntext
-          //   />
-        ))}
+        <DndContext onDragEnd={handleDragEvent}>
+          <SortableContext items={nodes} strategy={verticalListSortingStrategy}>
+            {nodes.map((node, index) => (
+              <NodeContainer
+                key={node.id}
+                node={node}
+                updateFocusedIndex={setFocusedNodeIndex}
+                isFocused={focusedNodeIndex === index}
+                index={index}
+              />
+              //   <BasicNode
+              //     key={node.id}
+              //     node={node}
+              //     updateFocusedIndex={setFocusedNodeIndex}
+              //     isFocused={focusedNodeIndex === index}
+              //     index={index}
+              //     // addNode={addNode}
+              //     // removeNodeByIndex={removeNodeByIndex}
+              //     // changeNodeValue={changeNodeValue} - we're getting these from APpStateCOntext
+              //   />
+            ))}
+          </SortableContext>
+          <DragOverlay />
+        </DndContext>
+
         <Spacer
           handleClick={() => {
             addNode({ type: "text", value: "", id: nanoid() }, nodes.length);
